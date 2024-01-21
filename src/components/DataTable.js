@@ -12,7 +12,7 @@ const DataTable = ({ columns, rows }) => {
               scope="col"
               className="px-4 py-3"
               key={index}
-              style={{ width: item.width ? item.width : "" }}
+              style={{ width: item?.width ? item.width : "" }}
             >
               {item.headerName}
             </th>

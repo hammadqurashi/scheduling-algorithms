@@ -1,17 +1,19 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import SelectInput from "./inputs/SelectInput";
 import MultiSelect from "./inputs/MultiSelect";
 import { fcfs } from "@/solve/fcfs";
 import { sjf } from "@/solve/sjf";
 import InputField from "./inputs/InputField";
 import { rr } from "@/solve/rr";
+import pr from "@/solve/pr";
 
 const options = [
   { value: "fcfs", label: "First Come First Serve" },
   { value: "sjf", label: "Shortest Job First" },
   { value: "rr", label: "Round Robin" },
+  { value: "pr", label: "Priority" },
 ];
 
 const InputBox = ({
@@ -26,14 +28,17 @@ const InputBox = ({
   setShowOutput,
   setOutput,
 }) => {
+  const [priorities, setPriorities] = useState([]);
+
   const handleSolve = () => {
     let solve = {};
 
     if (
-      (selectedAlg.length === 0 &&
-        arrivalTime.length === 0 &&
-        burstTime.length === 0) ||
-      arrivalTime.length !== burstTime.length
+      selectedAlg.length === 0 ||
+      arrivalTime.length === 0 ||
+      burstTime.length === 0 ||
+      (selectedAlg === "rr" && arrivalTime.length !== burstTime.length) ||
+      (selectedAlg === "pr" && priorities.length !== burstTime.length)
     ) {
       return alert("Enter Correct Values");
     }
@@ -44,7 +49,10 @@ const InputBox = ({
       solve = sjf(arrivalTime, burstTime);
     }
     if (selectedAlg === "rr") {
-      solve = rr(quantumNo, arrivalTime, burstTime);
+      solve = rr(burstTime, quantumNo);
+    }
+    if (selectedAlg === "pr") {
+      solve = pr(arrivalTime, burstTime, priorities);
     }
     setOutput(solve);
     setShowOutput(true);
@@ -57,11 +65,13 @@ const InputBox = ({
         options={options}
         setSelectedAlg={setSelectedAlg}
       />
-      <MultiSelect
-        label={"Arrival Times"}
-        placeholder={"Arrival Times"}
-        setEnteredValue={setArrivalTime}
-      />
+      {selectedAlg !== "rr" && (
+        <MultiSelect
+          label={"Arrival Times"}
+          placeholder={"Arrival Times"}
+          setEnteredValue={setArrivalTime}
+        />
+      )}
       <MultiSelect
         label={"Burst Times"}
         placeholder={"Burst Times"}
@@ -77,6 +87,13 @@ const InputBox = ({
           setValue={setQuantumNo}
           required={true}
           type="number"
+        />
+      )}
+      {selectedAlg === "pr" && (
+        <MultiSelect
+          label={"Priorities"}
+          placeholder={"Priorities"}
+          setEnteredValue={setPriorities}
         />
       )}
       <button

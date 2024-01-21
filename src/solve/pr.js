@@ -1,17 +1,18 @@
-export const sjf = (arrivalTime, burstTime) => {
+const pr = (arrivalTime, burstTime, priorities) => {
   const processesInfo = arrivalTime
     .map((item, index) => {
       return {
         job: "P" + index,
         at: Number.parseInt(item),
         bt: Number.parseInt(burstTime[index]),
+        priority: Number.parseInt(priorities[index]),
       };
     })
-    .sort((obj1, obj2) => {
-      if (obj1.at > obj2.at) return 1;
-      if (obj1.at < obj2.at) return -1;
-      if (obj1.bt > obj2.bt) return 1;
-      if (obj1.bt < obj2.bt) return -1;
+    .sort((process1, process2) => {
+      if (process1.at > process2.at) return 1;
+      if (process1.at < process2.at) return -1;
+      if (process1.priority > process2.priority) return 1;
+      if (process1.priority < process2.priority) return -1;
       return 0;
     });
 
@@ -25,10 +26,7 @@ export const sjf = (arrivalTime, burstTime) => {
   for (let i = 0; i < processesInfo.length; i++) {
     if (i === 0) {
       readyQueue.push(processesInfo[0]);
-      finishTime.push(
-        Number.parseInt(processesInfo[0].at) +
-          Number.parseInt(processesInfo[0].bt)
-      );
+      finishTime.push(processesInfo[0].at + processesInfo[0].bt);
       solvedProcessesInfo.push({
         ...processesInfo[0],
         ft: finishTime[0],
@@ -62,22 +60,22 @@ export const sjf = (arrivalTime, burstTime) => {
           .sort((a, b) => {
             if (a.at > b.at) return 1;
             if (a.at < b.at) return -1;
-            if (a.bt > b.bt) return 1;
-            if (a.bt < a.bt) return -1;
+            if (a.priority > b.priority) return 1;
+            if (a.priority < a.priority) return -1;
             return 0;
           });
         readyQueue.push(unfinishedJobs[0]);
       }
 
-      const rqSortedByBT = [...readyQueue].sort((a, b) => {
-        if (a.bt > b.bt) return 1;
-        if (a.bt < b.bt) return -1;
+      const rqSortedByPriority = [...readyQueue].sort((a, b) => {
+        if (a.priority > b.priority) return 1;
+        if (a.priority < b.priority) return -1;
         if (a.at > b.at) return 1;
         if (a.at < b.at) return -1;
         return 0;
       });
 
-      const processToExecute = rqSortedByBT[0];
+      const processToExecute = rqSortedByPriority[0];
 
       const previousFinishTime = finishTime[finishTime.length - 1];
 
@@ -127,7 +125,6 @@ export const sjf = (arrivalTime, burstTime) => {
     }
   }
 
-  // Sort the processes by job name within arrival time
   solvedProcessesInfo.sort((obj1, obj2) => {
     if (obj1.at > obj2.at) return 1;
     if (obj1.at < obj2.at) return -1;
@@ -136,5 +133,8 @@ export const sjf = (arrivalTime, burstTime) => {
     return 0;
   });
 
+  console.log(solvedProcessesInfo);
   return { solvedProcessesInfo, ganttChartInfo };
 };
+
+export default pr;

@@ -3,9 +3,18 @@
 import React, { useEffect, useState } from "react";
 import DataTable from "./DataTable";
 
+const fieldLabels = {
+  at: "Arrival Time",
+  bt: "Burst Time",
+  job: "Process",
+  tat: "Turn Around Time",
+  wat: "Waiting Time",
+};
+
 const OutputBox = ({ showOutput, output }) => {
   const [awt, setAwt] = useState(0);
   const [atat, setAtat] = useState(0);
+  const [outputCols, setOutputCols] = useState([]);
 
   useEffect(() => {
     const calculateAverageTime = () => {
@@ -24,6 +33,20 @@ const OutputBox = ({ showOutput, output }) => {
         setAtat(0);
       }
     };
+
+    const makeOutputCols = () => {
+      const cols = [];
+      Array.from(Object.keys(output?.solvedProcessesInfo?.[0] || {})).forEach(
+        (item) => {
+          if (Object.keys(fieldLabels).includes(item)) {
+            cols.push({ field: item, headerName: fieldLabels[item] });
+          }
+        }
+      );
+      setOutputCols(cols);
+    };
+
+    makeOutputCols();
     calculateAverageTime();
   }, [output]);
 
@@ -32,21 +55,14 @@ const OutputBox = ({ showOutput, output }) => {
       {showOutput ? (
         <div className="flex flex-col gap-4">
           <DataTable
-            columns={[
-              { field: "job", headerName: "PROCESS" },
-              { field: "at", headerName: "Arrival Time" },
-              { field: "bt", headerName: "Burst Time" },
-              { field: "wat", headerName: "Waiting Time" },
-              { field: "tat", headerName: "Turn Around Time" },
-            ]}
-            // rows={[
-            //   {
-            //     process: "P1",
-            //     bt: 24,
-            //     wt: 12,
-            //     tat: 5,
-            //   },
+            // columns={[
+            //   { field: "job", headerName: "PROCESS" },
+            //   { field: "at", headerName: "Arrival Time" },
+            //   { field: "bt", headerName: "Burst Time" },
+            //   { field: "wat", headerName: "Waiting Time" },
+            //   { field: "tat", headerName: "Turn Around Time" },
             // ]}
+            columns={outputCols}
             rows={output?.solvedProcessesInfo}
           />
 

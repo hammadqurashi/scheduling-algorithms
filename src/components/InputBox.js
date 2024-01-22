@@ -16,18 +16,11 @@ const options = [
   { value: "pr", label: "Priority" },
 ];
 
-const InputBox = ({
-  selectedAlg,
-  setSelectedAlg,
-  arrivalTime,
-  setArrivalTime,
-  burstTime,
-  setBurstTime,
-  quantumNo,
-  setQuantumNo,
-  setShowOutput,
-  setOutput,
-}) => {
+const InputBox = ({ setShowOutput, setOutput }) => {
+  const [selectedAlg, setSelectedAlg] = useState("");
+  const [arrivalTime, setArrivalTime] = useState([]);
+  const [burstTime, setBurstTime] = useState([]);
+  const [quantumNo, setQuantumNo] = useState(0);
   const [priorities, setPriorities] = useState([]);
 
   const handleSolve = () => {
